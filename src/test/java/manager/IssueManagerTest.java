@@ -148,7 +148,7 @@ public class IssueManagerTest {
             issueRepository.save(issues[0]);
             issueRepository.save(issues[1]);
             issueRepository.save(issues[2]);
-            List<Issue> actual = issueManager.filterBy(issueRepository.findAll(), issueManager.filterByAuthor("Tesr"));
+            List<Issue> actual = issueManager.filterByAuthor("Tesr");
             List<Issue> expected = new ArrayList<>();
             assertIterableEquals(actual, expected);
 
@@ -166,7 +166,7 @@ public class IssueManagerTest {
             issueRepository.save(issues[0]);
             issueRepository.save(issues[1]);
             issueRepository.save(issues[2]);
-            List<Issue> actual = issueManager.filterBy(issueRepository.findAll(), issueManager.filterByAuthor("Ivan"));
+            List<Issue> actual = issueManager.filterByAuthor("Ivan");
             List<Issue> expected = new ArrayList<>();
             expected.add(issues[1]);
             assertIterableEquals(actual, expected);
@@ -184,7 +184,7 @@ public class IssueManagerTest {
             issueRepository.save(issues[0]);
             issueRepository.save(issues[1]);
             issueRepository.save(issues[2]);
-            List<Issue> actual = issueManager.filterBy(issueRepository.findAll(), issueManager.filterByAuthor("Ivan"));
+            List<Issue> actual = issueManager.filterByAuthor("Ivan");
             List<Issue> expected = new ArrayList<>();
             expected.add(issues[1]);
             expected.add(issues[2]);
@@ -210,7 +210,7 @@ public class IssueManagerTest {
             issueRepository.save(issues[0]);
             issueRepository.save(issues[1]);
             issueRepository.save(issues[2]);
-            List<Issue> actual = issueManager.filterBy(issueRepository.findAll(), issueManager.filterByAssignee("Tesr"));
+            List<Issue> actual = issueManager.filterByAssignee("Test");
             List<Issue> expected = new ArrayList<>();
             assertIterableEquals(actual, expected);
 
@@ -228,7 +228,7 @@ public class IssueManagerTest {
             issueRepository.save(issues[0]);
             issueRepository.save(issues[1]);
             issueRepository.save(issues[2]);
-            List<Issue> actual = issueManager.filterBy(issueRepository.findAll(), issueManager.filterByAssignee("Sidor"));
+            List<Issue> actual = issueManager.filterByAssignee("Sidor");
             List<Issue> expected = new ArrayList<>();
             expected.add(issues[1]);
             assertIterableEquals(actual, expected);
@@ -245,7 +245,7 @@ public class IssueManagerTest {
             issueRepository.save(issues[0]);
             issueRepository.save(issues[1]);
             issueRepository.save(issues[2]);
-            List<Issue> actual = issueManager.filterBy(issueRepository.findAll(), issueManager.filterByAssignee("Sidor"));
+            List<Issue> actual = issueManager.filterByAssignee("Sidor");
             List<Issue> expected = new ArrayList<>();
             expected.add(issues[0]);
             expected.add(issues[1]);
@@ -275,7 +275,7 @@ public class IssueManagerTest {
             issueRepository.save(issues[0]);
             issueRepository.save(issues[1]);
             issueRepository.save(issues[2]);
-            List<Issue> actual = issueManager.filterBy(issueRepository.findAll(), issueManager.filterByLabel(labelsThree));
+            List<Issue> actual = issueManager.filterByLabel(labelsThree);
             List<Issue> expected = new ArrayList<>();
             assertIterableEquals(actual, expected);
         }
@@ -295,7 +295,7 @@ public class IssueManagerTest {
             issueRepository.save(issues[0]);
             issueRepository.save(issues[1]);
             issueRepository.save(issues[2]);
-            List<Issue> actual = issueManager.filterBy(issueRepository.findAll(), issueManager.filterByLabel(labelsOne));
+            List<Issue> actual = issueManager.filterByLabel(labelsOne);
             List<Issue> expected = new ArrayList<>();
             expected.add(issues[0]);
             assertIterableEquals(actual, expected);
@@ -325,7 +325,7 @@ public class IssueManagerTest {
             HashSet<String> tmp = new HashSet<>();
             tmp.add("tag1");
             tmp.add("tag3");
-            List<Issue> actual = issueManager.filterBy(issueRepository.findAll(), issueManager.filterByLabel(tmp));
+            List<Issue> actual = issueManager.filterByLabel(tmp);
             List<Issue> expected = new ArrayList<>();
             expected.add(issues[0]);
             expected.add(issues[1]);
@@ -372,7 +372,7 @@ public class IssueManagerTest {
             issues = new Issue[1];
             issues[0] = new Issue(2, "Ivanov", false, labels, "Sidorov");
             issueRepository.save(issues[0]);
-            issueManager.closeIssue(issues[0]);
+            issueManager.closeIssue(2);
             boolean expected = true;
             boolean actual = issues[0].isClosed();
             assertEquals(actual, expected);
@@ -387,11 +387,24 @@ public class IssueManagerTest {
             issues = new Issue[1];
             issues[0] = new Issue(2, "Ivanov", true, labels, "Sidorov");
             issueRepository.save(issues[0]);
-            issueManager.closeIssue(issues[0]);
+            issueManager.closeIssue(2);
             boolean expected = true;
             boolean actual = issues[0].isClosed();
             assertEquals(actual, expected);
 
+        }
+
+        @Test
+        void closeIssueNotExist() {
+            HashSet<String> labels = new HashSet<>();
+            labels.add("tag1");
+            issues = new Issue[1];
+            issues[0] = new Issue(2, "Ivanov", true, labels, "Sidorov");
+            issueRepository.save(issues[0]);
+            String actual = issueManager.closeIssue(1);
+            String expected = "Issue doesn't exist";
+
+            assertEquals(actual, expected);
         }
 
     }
@@ -407,7 +420,7 @@ public class IssueManagerTest {
             issues = new Issue[1];
             issues[0] = new Issue(2, "Ivanov", false, labels, "Sidorov");
             issueRepository.save(issues[0]);
-            issueManager.openIssue(issues[0]);
+            issueManager.openIssue(2);
             boolean expected = false;
             boolean actual = issues[0].isClosed();
             assertEquals(actual, expected);
@@ -422,11 +435,24 @@ public class IssueManagerTest {
             issues = new Issue[1];
             issues[0] = new Issue(2, "Ivanov", true, labels, "Sidorov");
             issueRepository.save(issues[0]);
-            issueManager.openIssue(issues[0]);
+            issueManager.openIssue(2);
             boolean expected = false;
             boolean actual = issues[0].isClosed();
             assertEquals(actual, expected);
 
+        }
+
+        @Test
+        void openIssueNotExist() {
+            HashSet<String> labels = new HashSet<>();
+            labels.add("tag1");
+            issues = new Issue[1];
+            issues[0] = new Issue(2, "Ivanov", true, labels, "Sidorov");
+            issueRepository.save(issues[0]);
+            String actual = issueManager.openIssue(1);
+            String expected = "Issue doesn't exist";
+
+            assertEquals(actual, expected);
         }
     }
 }

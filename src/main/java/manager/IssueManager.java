@@ -42,23 +42,31 @@ public class IssueManager implements Predicate<Issue> {
     }
 
 
-    public Predicate<Issue> filterByAuthor(String author) {
-        return p -> author.equalsIgnoreCase(p.getAuthor());
+    public List<Issue> filterByAuthor(String author) {
+        Predicate<Issue> isAuthor = p -> author.equalsIgnoreCase(p.getAuthor());
+        return filterBy(isAuthor);
     }
 
-    public Predicate<Issue> filterByAssignee(String assignee) {
-        return p -> p.getAssignee().equalsIgnoreCase(assignee);
+    public List<Issue> filterByAssignee(String assignee) {
+        Predicate<Issue> isAssignee = p -> assignee.equalsIgnoreCase(p.getAssignee());
+        return filterBy(isAssignee);
     }
 
-    public Predicate<Issue> filterByLabel(HashSet<String> label) {
-        return p -> p.getLabel().containsAll(label);
+    public List<Issue> filterByLabel(HashSet<String> label) {
+        Predicate<Issue> isLabel = p -> p.getLabel().containsAll(label);
+        return filterBy(isLabel);
     }
 
-    //фильтрация по автору
-    public List<Issue> filterBy(List<Issue> issues, Predicate<Issue> predicate) {
-
-        return issues.stream().filter(predicate).collect(Collectors.<Issue>toList());
+    public List<Issue> filterBy (Predicate<Issue> predicate) {
+        List<Issue> issues = new ArrayList<>();
+        for (Issue tmp:issueRepository.findAll()) {
+            if(predicate.test(tmp)) {
+                issues.add(tmp);
+            }
+        }
+        return issues;
     }
+
 
     //сортировка Issues по id
     public List<Issue> sortIssues() {
@@ -67,14 +75,28 @@ public class IssueManager implements Predicate<Issue> {
     }
 
     //закрыть Issue
-    public void closeIssue(Issue issue) {
-        issue.setClosed(true);
+    public String closeIssue(int id) {
+        for (Issue issue:issueRepository.findAll()) {
+            if(issue.getId() == id) {
+                issue.setClosed(true);
+                return "Issue is closed";
+            }
+        }
+        return "Issue doesn't exist";
     }
 
     //открыть Issue
-    public void openIssue(Issue issue) {
-        issue.setClosed(false);
+    public String openIssue(int id) {
+        for (Issue issue:issueRepository.findAll()) {
+            if(issue.getId() == id) {
+                issue.setClosed(false);
+                return "Issue is opened";
+            }
+        }
+        return "Issue doesn't exist";
     }
+
+
 
     @Override
     public boolean test(Issue issue) {
